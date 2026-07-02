@@ -6,7 +6,7 @@ Similar layout to [MMM-RandomQuranAyah](https://github.com/slametps/MMM-RandomQu
 
 ## Features
 
-- Local hadith collection (bundled: **Nawawi 40**)
+- Local hadith collection (**5,473 hadiths** bundled)
 - Same hadith all day, changes at midnight
 - Optional random rotation mode
 - Arabic + English + reference
@@ -80,11 +80,35 @@ dataFile: "data/my-hadiths.json"
 
 ## How daily rotation works
 
-The module picks hadith index = `dayOfYear % numberOfHadiths`. With 42 hadiths (Nawawi 40), you get a different one each day for about six weeks before the cycle repeats.
+The module picks hadith index = `dayOfYear % numberOfHadiths`. With 5,473 hadiths, you get a unique hadith each day for about **15 years** before the cycle repeats.
+
+## Bundled collections (5,473 hadiths)
+
+| Collection | Hadiths |
+|------------|---------|
+| Riyad as-Salihin | 1,896 |
+| Bulugh al-Maram | 1,767 |
+| Al-Adab Al-Mufrad | 1,326 |
+| Shamail al-Muhammadiyah | 402 |
+| Nawawi 40 | 42 |
+| Forty Hadith Qudsi | 40 |
+
+At one hadith per day, that's **~15 years** before the cycle repeats.
+
+## Rebuilding the data file
+
+To refresh or customize the bundled data:
+
+```bash
+cd ~/MagicMirror/modules/MMM-DailyHadith
+npm run build:data
+```
+
+Edit `scripts/build-hadiths.js` to add or remove sources from [hadith-json](https://github.com/AhmedBaset/hadith-json).
 
 ## Data source
 
-Bundled collection: **The Forty Hadith of Imam Nawawi**  
+Bundled collections listed above (~6.3 MB total).  
 Text prepared from [AhmedBaset/hadith-json](https://github.com/AhmedBaset/hadith-json) (sourced from [sunnah.com](https://sunnah.com)).
 
 You can add more collections by dropping JSON files into `data/`.

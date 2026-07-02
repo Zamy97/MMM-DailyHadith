@@ -9,6 +9,9 @@ const path = require("path");
 const NodeHelper = require("node_helper");
 
 module.exports = NodeHelper.create({
+	hadithCache: null,
+	cacheFile: null,
+
 	start() {
 		console.log(`Starting node_helper for ${this.name}`);
 	},
@@ -22,8 +25,17 @@ module.exports = NodeHelper.create({
 
 	loadHadithFile(dataFile) {
 		const filePath = path.join(__dirname, dataFile);
+
+		if (this.hadithCache && this.cacheFile === filePath) {
+			return this.hadithCache;
+		}
+
 		const raw = fs.readFileSync(filePath, "utf8");
-		return JSON.parse(raw);
+		this.hadithCache = JSON.parse(raw);
+		this.cacheFile = filePath;
+		console.log(`${this.name}: loaded ${this.hadithCache.total || this.hadithCache.hadiths.length} hadiths`);
+
+		return this.hadithCache;
 	},
 
 	pickHadith(data, rotationMode) {
