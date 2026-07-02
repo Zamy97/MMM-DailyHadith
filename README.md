@@ -46,7 +46,9 @@ Add to `~/MagicMirror/config/config.js`:
 
 Restart MagicMirror. No `npm install` required.
 
-**The hadith database (`data/hadiths.json`, ~7.6 MB) is pre-built and included in this repo.** Clone/pull is enough — do not run `npm run build:data` on the Pi.
+**The hadith database (`data/hadiths.json`, ~7.7 MB) is pre-built and included in this repo.** Clone/pull is enough — do not run `npm run build:data` on the Pi.
+
+A **full library** (~141 MB, 50,844 hadiths, 35k+ with Bangla) is also in `data/library/` — one JSON file per book, for future MagicMirror modules.
 
 ## Configuration
 
@@ -127,19 +129,31 @@ Full Bangla text for Riyad/Bukhari/Muslim is not bundled yet (no open bulk datas
 
 At one hadith per day, that's **~15 years** before the cycle repeats.
 
+## Full hadith library (future use)
+
+| Location | Hadiths | Size | Bangla |
+|----------|---------|------|--------|
+| `data/hadiths.json` | 5,473 | ~7.7 MB | 42 |
+| `data/library/` | 50,844 | ~141 MB total | 35,452 |
+
+The library is split into **16 book files** (largest: Bukhari ~28 MB) so GitHub accepts them. See `data/library/index.json` for the manifest.
+
+Future modules can load e.g. `data/library/sahih-al-bukhari.json` directly.
+
 ## Rebuilding the data file (maintainers only)
 
-The built data lives in `data/hadiths.json` and is **saved in GitHub**. Mirror users only need `git pull`.
-
-To rebuild on your computer (or via GitHub Actions → **Build Hadith Data** → Run workflow):
+The built data lives in GitHub. Mirror users only need `git pull`.
 
 ```bash
-cd MMM-DailyHadith
-npm run build:data
-git add data/hadiths.json data/build-info.json
+npm run build:data      # daily file (~7.7 MB)
+npm run build:library   # full library in data/library/ (~141 MB)
+npm run build:all       # both
+git add data/
 git commit -m "Rebuild hadith data"
 git push
 ```
+
+Or use GitHub Actions → **Build Hadith Data** → Run workflow.
 
 Edit `scripts/build-hadiths.js` to add or remove sources from [hadith-json](https://github.com/AhmedBaset/hadith-json).
 

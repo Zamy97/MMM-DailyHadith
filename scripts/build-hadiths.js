@@ -1,52 +1,43 @@
 #!/usr/bin/env node
 /**
- * Builds data/hadiths.json from hadith-json sources on GitHub.
- * Adds topic, teaching summary, and Bangla where available.
- * Run: npm run build:data
+ * Builds hadith JSON databases from hadith-json + Bangla sources.
+ *
+ *   npm run build:data      -> data/hadiths.json (~7 MB, daily mirror module)
+ *   npm run build:library   -> data/hadiths-library.json (~25+ MB, full archive)
+ *   npm run build:all       -> both
  */
 
 const fs = require("fs");
 const path = require("path");
 const https = require("https");
 
-const SOURCES = [
-	{
-		key: "riyad_assalihin",
-		url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book/other_books/riyad_assalihin.json",
-		referencePrefix: "Riyad as-Salihin",
-		banglaEdition: null
-	},
-	{
-		key: "aladab_almufrad",
-		url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book/other_books/aladab_almufrad.json",
-		referencePrefix: "Al-Adab Al-Mufrad",
-		banglaEdition: null
-	},
-	{
-		key: "bulugh_almaram",
-		url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book/other_books/bulugh_almaram.json",
-		referencePrefix: "Bulugh al-Maram",
-		banglaEdition: null
-	},
-	{
-		key: "shamail_muhammadiyah",
-		url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book/other_books/shamail_muhammadiyah.json",
-		referencePrefix: "Shamail al-Muhammadiyah",
-		banglaEdition: null
-	},
-	{
-		key: "nawawi40",
-		url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book/forties/nawawi40.json",
-		referencePrefix: "Nawawi 40",
-		banglaEdition: "ben-nawawi"
-	},
-	{
-		key: "qudsi40",
-		url: "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book/forties/qudsi40.json",
-		referencePrefix: "Forty Hadith Qudsi",
-		banglaEdition: null
-	}
+const BASE = "https://raw.githubusercontent.com/AhmedBaset/hadith-json/main/db/by_book";
+
+const DAILY_SOURCES = [
+	book("riyad_assalihin", `${BASE}/other_books/riyad_assalihin.json`, "Riyad as-Salihin"),
+	book("aladab_almufrad", `${BASE}/other_books/aladab_almufrad.json`, "Al-Adab Al-Mufrad"),
+	book("bulugh_almaram", `${BASE}/other_books/bulugh_almaram.json`, "Bulugh al-Maram"),
+	book("shamail_muhammadiyah", `${BASE}/other_books/shamail_muhammadiyah.json`, "Shamail al-Muhammadiyah"),
+	book("nawawi40", `${BASE}/forties/nawawi40.json`, "Nawawi 40", "ben-nawawi"),
+	book("qudsi40", `${BASE}/forties/qudsi40.json`, "Forty Hadith Qudsi")
 ];
+
+const LIBRARY_EXTRA_SOURCES = [
+	book("bukhari", `${BASE}/the_9_books/bukhari.json`, "Sahih al-Bukhari", "ben-bukhari"),
+	book("muslim", `${BASE}/the_9_books/muslim.json`, "Sahih Muslim", "ben-muslim"),
+	book("abudawud", `${BASE}/the_9_books/abudawud.json`, "Sunan Abu Dawud", "ben-abudawud"),
+	book("tirmidhi", `${BASE}/the_9_books/tirmidhi.json`, "Jami at-Tirmidhi", "ben-tirmidhi"),
+	book("nasai", `${BASE}/the_9_books/nasai.json`, "Sunan an-Nasa'i", "ben-nasai"),
+	book("ibnmajah", `${BASE}/the_9_books/ibnmajah.json`, "Sunan Ibn Majah", "ben-ibnmajah"),
+	book("malik", `${BASE}/the_9_books/malik.json`, "Muwatta Malik", "ben-malik"),
+	book("mishkat_almasabih", `${BASE}/other_books/mishkat_almasabih.json`, "Mishkat al-Masabih"),
+	book("ahmed", `${BASE}/the_9_books/ahmed.json`, "Musnad Ahmad"),
+	book("darimi", `${BASE}/the_9_books/darimi.json`, "Sunan ad-Darimi")
+];
+
+function book(key, url, referencePrefix, banglaEdition = null) {
+	return { key, url, referencePrefix, banglaEdition };
+}
 
 const TOPIC_BN = {
 	"The Book of Good Manners": "আদব ও শিষ্টাচার",
@@ -70,6 +61,22 @@ const TOPIC_BN = {
 	"The Book of Miscellaneous ahadith of Significant Values": "গুরুত্বপূর্ণ বিবিধ হাদীস",
 	"The Book of Forgiveness": "ক্ষমা",
 	"The Book of Miscellany": "বিবিধ"
+};
+
+const PRESETS = {
+	daily: {
+		file: "data/hadiths.json",
+		infoFile: "data/build-info.json",
+		label: "Daily Hadith Collection",
+		sources: DAILY_SOURCES
+	},
+	library: {
+		file: "data/library",
+		infoFile: "data/build-info-library.json",
+		label: "Full Hadith Library",
+		sources: [...DAILY_SOURCES, ...LIBRARY_EXTRA_SOURCES],
+		splitByBook: true
+	}
 };
 
 function fetchJson(url) {
@@ -182,6 +189,7 @@ function transformCollection(raw, source, banglaByNumber) {
 		const textBn = banglaByNumber?.[hadith.idInBook] || "";
 
 		return {
+			book: source.referencePrefix,
 			id: hadith.idInBook,
 			arabic: hadith.arabic,
 			narrator,
@@ -196,12 +204,119 @@ function transformCollection(raw, source, banglaByNumber) {
 	});
 }
 
-async function main() {
-	const allHadiths = [];
-	const collections = [];
-	const banglaStats = { total: 0, withBangla: 0 };
+function slugify(name) {
+	return name
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, "-")
+		.replace(/^-|-$/g, "");
+}
 
-	for (const source of SOURCES) {
+function writeSingleFile(preset, output, banglaAvailable) {
+	const outPath = path.join(__dirname, "..", preset.file);
+	const infoPath = path.join(__dirname, "..", preset.infoFile);
+	fs.mkdirSync(path.dirname(outPath), { recursive: true });
+	fs.writeFileSync(outPath, JSON.stringify(output));
+
+	const buildInfo = {
+		builtAt: new Date().toISOString(),
+		preset: preset.label,
+		total: output.total,
+		banglaAvailable,
+		collections: output.collections,
+		file: preset.file,
+		sizeBytes: fs.statSync(outPath).size
+	};
+	fs.writeFileSync(infoPath, `${JSON.stringify(buildInfo, null, 2)}\n`);
+
+	const sizeMb = (buildInfo.sizeBytes / (1024 * 1024)).toFixed(2);
+	console.log(`\nWrote ${output.total} hadiths to ${preset.file} (${sizeMb} MB)`);
+	console.log(`Bangla text available for ${banglaAvailable} hadiths`);
+
+	return buildInfo;
+}
+
+function writeSplitLibrary(preset, collections, banglaAvailable) {
+	const libraryDir = path.join(__dirname, "..", preset.file);
+	fs.mkdirSync(libraryDir, { recursive: true });
+
+	const index = {
+		builtAt: new Date().toISOString(),
+		preset: "library",
+		label: preset.label,
+		total: 0,
+		banglaAvailable: 0,
+		books: []
+	};
+
+	let globalId = 1;
+
+	for (const collection of collections) {
+		const bookHadiths = collection.hadiths.map((hadith) => ({
+			...hadith,
+			id: globalId++
+		}));
+
+		const bookOutput = {
+			book: collection.name,
+			total: bookHadiths.length,
+			banglaAvailable: bookHadiths.filter((hadith) => hadith.textBn).length,
+			hadiths: bookHadiths
+		};
+
+		const filename = `${slugify(collection.name)}.json`;
+		const bookPath = path.join(libraryDir, filename);
+		fs.writeFileSync(bookPath, JSON.stringify(bookOutput));
+
+		const sizeBytes = fs.statSync(bookPath).size;
+		index.total += bookHadiths.length;
+		index.banglaAvailable += bookOutput.banglaAvailable;
+		index.books.push({
+			name: collection.name,
+			file: `data/library/${filename}`,
+			count: bookHadiths.length,
+			banglaCount: bookOutput.banglaAvailable,
+			sizeBytes
+		});
+
+		const sizeMb = (sizeBytes / (1024 * 1024)).toFixed(2);
+		console.log(`  -> data/library/${filename} (${bookHadiths.length} hadiths, ${sizeMb} MB)`);
+	}
+
+	const indexPath = path.join(libraryDir, "index.json");
+	fs.writeFileSync(indexPath, `${JSON.stringify(index, null, 2)}\n`);
+
+	const totalBytes = index.books.reduce((sum, book) => sum + book.sizeBytes, 0);
+	const infoPath = path.join(__dirname, "..", preset.infoFile);
+	const buildInfo = {
+		builtAt: index.builtAt,
+		preset: "library",
+		total: index.total,
+		banglaAvailable: index.banglaAvailable,
+		collections: index.books,
+		file: preset.file,
+		sizeBytes: totalBytes
+	};
+	fs.writeFileSync(infoPath, `${JSON.stringify(buildInfo, null, 2)}\n`);
+
+	const sizeMb = (totalBytes / (1024 * 1024)).toFixed(2);
+	console.log(`\nWrote ${index.total} hadiths across ${index.books.length} books (${sizeMb} MB total)`);
+	console.log(`Bangla text available for ${index.banglaAvailable} hadiths`);
+
+	return buildInfo;
+}
+
+async function buildPreset(presetName) {
+	const preset = PRESETS[presetName];
+	if (!preset) {
+		throw new Error(`Unknown preset: ${presetName}. Use: daily or library`);
+	}
+
+	console.log(`\n=== Building ${preset.label} ===\n`);
+
+	const collections = [];
+	let banglaAvailable = 0;
+
+	for (const source of preset.sources) {
 		console.log(`Fetching ${source.referencePrefix}...`);
 		const raw = await fetchJson(source.url);
 
@@ -212,53 +327,52 @@ async function main() {
 		}
 
 		const hadiths = transformCollection(raw, source, banglaByNumber);
-		allHadiths.push(...hadiths);
+		const banglaCount = hadiths.filter((hadith) => hadith.textBn).length;
+
+		banglaAvailable += banglaCount;
 		collections.push({
 			name: source.referencePrefix,
 			count: hadiths.length,
-			banglaCount: hadiths.filter((hadith) => hadith.textBn).length
+			banglaCount,
+			hadiths
 		});
-
-		const banglaCount = hadiths.filter((hadith) => hadith.textBn).length;
-		banglaStats.withBangla += banglaCount;
-		banglaStats.total += hadiths.length;
 		console.log(`  + ${hadiths.length} hadiths (${banglaCount} with Bangla)`);
 	}
 
+	if (preset.splitByBook) {
+		return writeSplitLibrary(preset, collections, banglaAvailable);
+	}
+
+	const allHadiths = collections.flatMap((collection) => collection.hadiths);
 	const output = {
-		collection: "Daily Hadith Collection",
+		collection: preset.label,
+		preset: presetName,
 		attribution: {
 			englishArabic: "AhmedBaset/hadith-json (sunnah.com)",
-			bangla: "fawazahmed0/hadith-api (ben-nawawi and other ben-* editions)"
+			bangla: "fawazahmed0/hadith-api (ben-* editions)"
 		},
-		collections,
+		collections: collections.map(({ name, count, banglaCount }) => ({ name, count, banglaCount })),
 		total: allHadiths.length,
-		banglaAvailable: banglaStats.withBangla,
+		banglaAvailable,
 		hadiths: allHadiths.map((hadith, index) => ({
 			...hadith,
 			id: index + 1
 		}))
 	};
 
-	const outPath = path.join(__dirname, "..", "data", "hadiths.json");
-	const infoPath = path.join(__dirname, "..", "data", "build-info.json");
-	fs.mkdirSync(path.dirname(outPath), { recursive: true });
-	fs.writeFileSync(outPath, JSON.stringify(output));
+	return writeSingleFile(preset, output, banglaAvailable);
+}
 
-	const buildInfo = {
-		builtAt: new Date().toISOString(),
-		total: output.total,
-		banglaAvailable: output.banglaAvailable,
-		collections: output.collections,
-		file: "data/hadiths.json",
-		sizeBytes: fs.statSync(outPath).size
-	};
-	fs.writeFileSync(infoPath, `${JSON.stringify(buildInfo, null, 2)}\n`);
+async function main() {
+	const mode = process.argv[2] || "daily";
 
-	const sizeMb = (buildInfo.sizeBytes / (1024 * 1024)).toFixed(2);
-	console.log(`\nWrote ${output.total} hadiths to ${outPath} (${sizeMb} MB)`);
-	console.log(`Wrote build metadata to ${infoPath}`);
-	console.log(`Bangla text available for ${output.banglaAvailable} hadiths`);
+	if (mode === "all") {
+		await buildPreset("daily");
+		await buildPreset("library");
+		return;
+	}
+
+	await buildPreset(mode);
 }
 
 main().catch((error) => {

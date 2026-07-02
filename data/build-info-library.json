@@ -1,0 +1,122 @@
+{
+  "builtAt": "2026-07-02T17:43:03.080Z",
+  "preset": "library",
+  "total": 50844,
+  "banglaAvailable": 35452,
+  "collections": [
+    {
+      "name": "Riyad as-Salihin",
+      "file": "data/library/riyad-as-salihin.json",
+      "count": 1896,
+      "banglaCount": 0,
+      "sizeBytes": 2702698
+    },
+    {
+      "name": "Al-Adab Al-Mufrad",
+      "file": "data/library/al-adab-al-mufrad.json",
+      "count": 1326,
+      "banglaCount": 0,
+      "sizeBytes": 2066416
+    },
+    {
+      "name": "Bulugh al-Maram",
+      "file": "data/library/bulugh-al-maram.json",
+      "count": 1767,
+      "banglaCount": 0,
+      "sizeBytes": 2418340
+    },
+    {
+      "name": "Shamail al-Muhammadiyah",
+      "file": "data/library/shamail-al-muhammadiyah.json",
+      "count": 402,
+      "banglaCount": 0,
+      "sizeBytes": 641315
+    },
+    {
+      "name": "Nawawi 40",
+      "file": "data/library/nawawi-40.json",
+      "count": 42,
+      "banglaCount": 42,
+      "sizeBytes": 166421
+    },
+    {
+      "name": "Forty Hadith Qudsi",
+      "file": "data/library/forty-hadith-qudsi.json",
+      "count": 40,
+      "banglaCount": 0,
+      "sizeBytes": 92102
+    },
+    {
+      "name": "Sahih al-Bukhari",
+      "file": "data/library/sahih-al-bukhari.json",
+      "count": 7277,
+      "banglaCount": 7243,
+      "sizeBytes": 29249931
+    },
+    {
+      "name": "Sahih Muslim",
+      "file": "data/library/sahih-muslim.json",
+      "count": 7459,
+      "banglaCount": 7265,
+      "sizeBytes": 24058283
+    },
+    {
+      "name": "Sunan Abu Dawud",
+      "file": "data/library/sunan-abu-dawud.json",
+      "count": 5276,
+      "banglaCount": 5270,
+      "sizeBytes": 18643428
+    },
+    {
+      "name": "Jami at-Tirmidhi",
+      "file": "data/library/jami-at-tirmidhi.json",
+      "count": 4053,
+      "banglaCount": 3891,
+      "sizeBytes": 18156320
+    },
+    {
+      "name": "Sunan an-Nasa'i",
+      "file": "data/library/sunan-an-nasa-i.json",
+      "count": 5768,
+      "banglaCount": 5656,
+      "sizeBytes": 17151601
+    },
+    {
+      "name": "Sunan Ibn Majah",
+      "file": "data/library/sunan-ibn-majah.json",
+      "count": 4345,
+      "banglaCount": 4336,
+      "sizeBytes": 13398371
+    },
+    {
+      "name": "Muwatta Malik",
+      "file": "data/library/muwatta-malik.json",
+      "count": 1985,
+      "banglaCount": 1749,
+      "sizeBytes": 6426406
+    },
+    {
+      "name": "Mishkat al-Masabih",
+      "file": "data/library/mishkat-al-masabih.json",
+      "count": 4428,
+      "banglaCount": 0,
+      "sizeBytes": 6194996
+    },
+    {
+      "name": "Musnad Ahmad",
+      "file": "data/library/musnad-ahmad.json",
+      "count": 1374,
+      "banglaCount": 0,
+      "sizeBytes": 2691650
+    },
+    {
+      "name": "Sunan ad-Darimi",
+      "file": "data/library/sunan-ad-darimi.json",
+      "count": 3406,
+      "banglaCount": 0,
+      "sizeBytes": 3320323
+    }
+  ],
+  "file": "data/library",
+  "sizeBytes": 147378601
+}

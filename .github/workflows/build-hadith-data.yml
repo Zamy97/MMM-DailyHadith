@@ -20,14 +20,14 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build hadith database
-        run: npm run build:data
+      - name: Build daily + full library databases
+        run: npm run build:all
 
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/hadiths.json data/build-info.json
+          git add data/hadiths.json data/build-info.json data/build-info-library.json data/library/
           if git diff --staged --quiet; then
             echo "No data changes to commit."
           else

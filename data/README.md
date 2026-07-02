@@ -1,34 +1,46 @@
 # Hadith data (pre-built)
 
-This folder contains the **pre-built** hadith database used by the module at runtime.
+Pre-built JSON — **committed to GitHub**. Clone/pull on the Pi; do not run `npm run build:*` there.
 
-| File | Purpose |
-|------|---------|
-| `hadiths.json` | Main database (~7.6 MB, 5,473 hadiths) — **committed to GitHub** |
-| `build-info.json` | When/how the data was built |
+## Daily module (what the mirror uses today)
 
-## For mirror users (Pi)
+| File | Hadiths | Size |
+|------|---------|------|
+| `hadiths.json` | 5,473 | ~7.7 MB |
+| `build-info.json` | metadata | tiny |
 
-**Do not run `npm run build:data` on the Pi.** Just clone or pull — the data is already here.
+## Full library (for future MM modules)
+
+| Path | Hadiths | Size | Bangla |
+|------|---------|------|--------|
+| `library/` (16 books) | 50,844 | ~141 MB | 35,452 |
+| `library/index.json` | manifest | tiny | — |
+
+Largest single file: `sahih-al-bukhari.json` (~28 MB). Split per book so GitHub accepts the repo (100 MB file limit).
+
+### Library books
+
+- Riyad as-Salihin, Al-Adab Al-Mufrad, Bulugh al-Maram, Shamail
+- Nawawi 40, Forty Hadith Qudsi
+- Sahih al-Bukhari, Sahih Muslim (with Bangla)
+- Sunan Abu Dawud, Tirmidhi, Nasa'i, Ibn Majah, Muwatta Malik (with Bangla)
+- Mishkat al-Masabih, Musnad Ahmad, Sunan ad-Darimi
+
+## Pi update
 
 ```bash
 git pull --ff-only
 ```
 
-If git complains about local changes to `hadiths.json`:
+If local build files conflict:
 
 ```bash
-git restore data/hadiths.json build-info.json
+git restore data/
 git pull --ff-only
 ```
 
-## For maintainers (rebuild on your computer)
+## Rebuild (Mac / GitHub Actions only)
 
 ```bash
-npm run build:data
-git add data/hadiths.json data/build-info.json
-git commit -m "Rebuild hadith data"
-git push
+npm run build:all
 ```
-
-Or trigger the **Build Hadith Data** GitHub Action (Actions tab → Run workflow).
