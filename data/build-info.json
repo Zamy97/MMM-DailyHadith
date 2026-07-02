@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-07-02T17:39:13.418Z",
+  "builtAt": "2026-07-02T17:39:34.870Z",
   "total": 5473,
   "banglaAvailable": 42,
   "collections": [
@@ -35,5 +35,5 @@
     }
   ],
   "file": "data/hadiths.json",
-  "sizeBytes": 7943058
+  "sizeBytes": 7942976
 }
