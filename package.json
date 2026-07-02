@@ -1,0 +1,17 @@
+{
+  "name": "mmm-dailyhadith",
+  "version": "1.0.0",
+  "description": "MagicMirror² module that displays a daily hadith from a local JSON collection (no API).",
+  "main": "MMM-DailyHadith.js",
+  "scripts": {},
+  "keywords": [
+    "magicmirror",
+    "magicmirror2",
+    "hadith",
+    "islamic"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

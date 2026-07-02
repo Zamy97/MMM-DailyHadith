@@ -1,0 +1,31 @@
+.MMM-DailyHadith .hadith-title {
+	text-align: center;
+	margin-bottom: 8px;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+}
+
+.MMM-DailyHadith .hadith-arabic {
+	direction: rtl;
+	text-align: right;
+	line-height: 1.6;
+	margin-bottom: 10px;
+}
+
+.MMM-DailyHadith .hadith-translation {
+	line-height: 1.5;
+	margin-bottom: 6px;
+}
+
+.MMM-DailyHadith .hadith-narrator {
+	font-style: italic;
+}
+
+.MMM-DailyHadith .hadith-reference {
+	text-align: right;
+	margin-top: 4px;
+}
+
+.MMM-DailyHadith .error {
+	color: #ff6b6b;
+}
