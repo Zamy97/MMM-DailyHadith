@@ -5,6 +5,11 @@
 	text-transform: uppercase;
 }
 
+.MMM-DailyHadith .hadith-topic {
+	margin-bottom: 6px;
+	font-style: italic;
+}
+
 .MMM-DailyHadith .hadith-arabic {
 	direction: rtl;
 	text-align: right;
@@ -15,6 +20,24 @@
 .MMM-DailyHadith .hadith-translation {
 	line-height: 1.5;
 	margin-bottom: 6px;
+}
+
+.MMM-DailyHadith .hadith-bangla {
+	line-height: 1.55;
+	margin-bottom: 8px;
+	color: #d7e8ff;
+}
+
+.MMM-DailyHadith .hadith-summary {
+	line-height: 1.45;
+	margin-bottom: 6px;
+	padding: 6px 8px;
+	border-left: 3px solid #ffff00;
+}
+
+.MMM-DailyHadith .hadith-summary-label {
+	font-weight: 600;
+	color: #ffff99;
 }
 
 .MMM-DailyHadith .hadith-narrator {

@@ -1,8 +1,11 @@
 Module.register("MMM-DailyHadith", {
 	defaults: {
 		showTitle: true,
+		showTopic: true,
+		showSummary: true,
 		showArabic: true,
 		showTranslation: true,
+		showBangla: true,
 		showReference: true,
 		showNarrator: true,
 		dataFile: "data/hadiths.json",
@@ -18,7 +21,8 @@ Module.register("MMM-DailyHadith", {
 
 	getTranslations() {
 		return {
-			en: "translations/en.json"
+			en: "translations/en.json",
+			bn: "translations/bn.json"
 		};
 	},
 
@@ -27,6 +31,17 @@ Module.register("MMM-DailyHadith", {
 			dataFile: this.config.dataFile,
 			rotationMode: this.config.rotationMode
 		});
+	},
+
+	appendBlock(wrapper, className, html) {
+		if (!html) {
+			return;
+		}
+
+		const block = document.createElement("div");
+		block.className = className;
+		block.innerHTML = html;
+		wrapper.appendChild(block);
 	},
 
 	start() {
@@ -58,23 +73,28 @@ Module.register("MMM-DailyHadith", {
 		}
 
 		if (this.config.showTitle) {
-			const title = document.createElement("div");
-			title.className = "hadith-title bright small light";
-			title.innerHTML = this.translate("TITLE");
-			wrapper.appendChild(title);
+			this.appendBlock(wrapper, "hadith-title bright small light", this.translate("TITLE"));
+		}
+
+		if (this.config.showTopic) {
+			const topic =
+				this.config.language === "bn" && this.hadith.topicBn
+					? this.hadith.topicBn
+					: this.hadith.topic;
+			if (topic) {
+				this.appendBlock(
+					wrapper,
+					"hadith-topic dimmed xsmall light",
+					`${this.translate("TOPIC")}: ${topic}`
+				);
+			}
 		}
 
 		if (this.config.showArabic && this.hadith.arabic) {
-			const arabic = document.createElement("div");
-			arabic.className = "hadith-arabic bright medium light";
-			arabic.innerHTML = this.hadith.arabic;
-			wrapper.appendChild(arabic);
+			this.appendBlock(wrapper, "hadith-arabic bright medium light", this.hadith.arabic);
 		}
 
 		if (this.config.showTranslation) {
-			const translation = document.createElement("div");
-			translation.className = "hadith-translation bright small light";
-
 			let html = "";
 			if (this.config.showNarrator && this.hadith.narrator) {
 				html += `<span class="hadith-narrator">${this.hadith.narrator}</span> `;
@@ -82,16 +102,29 @@ Module.register("MMM-DailyHadith", {
 			if (this.hadith.text) {
 				html += this.hadith.text;
 			}
+			this.appendBlock(wrapper, "hadith-translation bright small light", html);
+		}
 
-			translation.innerHTML = html;
-			wrapper.appendChild(translation);
+		if (this.config.showBangla && this.hadith.textBn) {
+			this.appendBlock(wrapper, "hadith-bangla bright small light", this.hadith.textBn);
+		}
+
+		if (this.config.showSummary) {
+			const summary =
+				this.config.language === "bn" && this.hadith.summaryBn
+					? this.hadith.summaryBn
+					: this.hadith.summary;
+			if (summary) {
+				this.appendBlock(
+					wrapper,
+					"hadith-summary bright xsmall light",
+					`<span class="hadith-summary-label">${this.translate("SUMMARY")}:</span> ${summary}`
+				);
+			}
 		}
 
 		if (this.config.showReference && this.hadith.reference) {
-			const reference = document.createElement("div");
-			reference.className = "hadith-reference dimmed xsmall light";
-			reference.innerHTML = this.hadith.reference;
-			wrapper.appendChild(reference);
+			this.appendBlock(wrapper, "hadith-reference dimmed xsmall light", this.hadith.reference);
 		}
 
 		return wrapper;

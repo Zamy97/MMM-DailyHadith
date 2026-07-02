@@ -1,5 +1,7 @@
 {
 	"TITLE": "Hadith of the Day",
+	"TOPIC": "Topic",
+	"SUMMARY": "Teaching",
 	"LOADING": "Loading hadith...",
 	"ERROR": "Could not load hadith."
 }

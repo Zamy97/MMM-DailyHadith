@@ -10,6 +10,9 @@ Similar layout to [MMM-RandomQuranAyah](https://github.com/slametps/MMM-RandomQu
 - Same hadith all day, changes at midnight
 - Optional random rotation mode
 - Arabic + English + reference
+- **Topic** (chapter name) for every hadith
+- **Teaching summary** (short extract) for every hadith
+- **Bangla translation** where available (Nawawi 40 + Bangla chapter topics for Riyad)
 - Works offline
 
 ## Installation
@@ -27,10 +30,14 @@ Add to `~/MagicMirror/config/config.js`:
 	position: "bottom_bar",
 	config: {
 		showTitle: true,
+		showTopic: true,
+		showSummary: true,
 		showArabic: true,
 		showTranslation: true,
+		showBangla: true,
 		showReference: true,
 		showNarrator: true,
+		language: "en",
 		rotationMode: "daily",
 		updateInterval: 60 * 60 * 1000
 	}
@@ -44,10 +51,14 @@ Restart MagicMirror. No `npm install` required.
 | Option | Description | Default |
 |--------|-------------|---------|
 | `showTitle` | Show "Hadith of the Day" heading | `true` |
+| `showTopic` | Show chapter/topic line | `true` |
+| `showSummary` | Show short teaching summary | `true` |
 | `showArabic` | Show Arabic text | `true` |
 | `showTranslation` | Show English translation | `true` |
+| `showBangla` | Show Bangla translation (when bundled) | `true` |
 | `showNarrator` | Show narrator line before text | `true` |
 | `showReference` | Show hadith reference | `true` |
+| `language` | UI labels + prefer Bangla topic/summary: `en` or `bn` | `en` |
 | `dataFile` | Path to JSON file (relative to module) | `data/hadiths.json` |
 | `rotationMode` | `"daily"` or `"random"` | `"daily"` |
 | `updateInterval` | How often to refresh (ms) | `3600000` (1 hour) |
@@ -66,6 +77,11 @@ Create your own `data/my-hadiths.json`:
 			"arabic": "نص الحديث",
 			"narrator": "Narrated ...",
 			"text": "The hadith text in English.",
+			"textBn": "বাংলা অনুবাদ (optional)",
+			"topic": "The Book of Good Manners",
+			"topicBn": "আদব ও শিষ্টাচার (optional)",
+			"summary": "Short teaching of the hadith.",
+			"summaryBn": "সংক্ষিপ্ত শিক্ষা (optional)",
 			"reference": "Sahih al-Bukhari 1"
 		}
 	]
@@ -81,6 +97,20 @@ dataFile: "data/my-hadiths.json"
 ## How daily rotation works
 
 The module picks hadith index = `dayOfYear % numberOfHadiths`. With 5,473 hadiths, you get a unique hadith each day for about **15 years** before the cycle repeats.
+
+## Bangla and teaching summary
+
+| Field | Coverage |
+|-------|----------|
+| `summary` | All 5,473 hadiths (auto-extracted from English) |
+| `topic` | All hadiths (chapter name) |
+| `topicBn` | Riyad as-Salihin chapters (Bangla topic names) |
+| `textBn` | Nawawi 40 (42 hadiths) via [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api) |
+| `summaryBn` | Nawawi 40 (when Bangla text exists) |
+
+Set `language: "bn"` to use Bangla UI labels and prefer Bangla topic/summary when available.
+
+Full Bangla text for Riyad/Bukhari/Muslim is not bundled yet (no open bulk dataset matched to this collection). You can add `textBn` to your own JSON entries.
 
 ## Bundled collections (5,473 hadiths)
 
@@ -108,8 +138,8 @@ Edit `scripts/build-hadiths.js` to add or remove sources from [hadith-json](http
 
 ## Data source
 
-Bundled collections listed above (~6.3 MB total).  
-Text prepared from [AhmedBaset/hadith-json](https://github.com/AhmedBaset/hadith-json) (sourced from [sunnah.com](https://sunnah.com)).
+Bundled collections listed above (~7.6 MB total).  
+English/Arabic via [hadith-json](https://github.com/AhmedBaset/hadith-json). Bangla via [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api) where available.
 
 You can add more collections by dropping JSON files into `data/`.
 
@@ -117,6 +147,7 @@ You can add more collections by dropping JSON files into `data/`.
 
 - Inspired by [MMM-RandomQuranAyah](https://github.com/slametps/MMM-RandomQuranAyah)
 - Hadith text via [hadith-json](https://github.com/AhmedBaset/hadith-json)
+- Bangla text via [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api)
 
 ## License
 
