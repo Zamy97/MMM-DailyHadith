@@ -1,0 +1,39 @@
+{
+  "builtAt": "2026-07-02T17:39:13.418Z",
+  "total": 5473,
+  "banglaAvailable": 42,
+  "collections": [
+    {
+      "name": "Riyad as-Salihin",
+      "count": 1896,
+      "banglaCount": 0
+    },
+    {
+      "name": "Al-Adab Al-Mufrad",
+      "count": 1326,
+      "banglaCount": 0
+    },
+    {
+      "name": "Bulugh al-Maram",
+      "count": 1767,
+      "banglaCount": 0
+    },
+    {
+      "name": "Shamail al-Muhammadiyah",
+      "count": 402,
+      "banglaCount": 0
+    },
+    {
+      "name": "Nawawi 40",
+      "count": 42,
+      "banglaCount": 42
+    },
+    {
+      "name": "Forty Hadith Qudsi",
+      "count": 40,
+      "banglaCount": 0
+    }
+  ],
+  "file": "data/hadiths.json",
+  "sizeBytes": 7943058
+}

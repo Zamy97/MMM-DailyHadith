@@ -241,11 +241,23 @@ async function main() {
 	};
 
 	const outPath = path.join(__dirname, "..", "data", "hadiths.json");
+	const infoPath = path.join(__dirname, "..", "data", "build-info.json");
 	fs.mkdirSync(path.dirname(outPath), { recursive: true });
 	fs.writeFileSync(outPath, JSON.stringify(output));
 
-	const sizeMb = (fs.statSync(outPath).size / (1024 * 1024)).toFixed(2);
+	const buildInfo = {
+		builtAt: new Date().toISOString(),
+		total: output.total,
+		banglaAvailable: output.banglaAvailable,
+		collections: output.collections,
+		file: "data/hadiths.json",
+		sizeBytes: fs.statSync(outPath).size
+	};
+	fs.writeFileSync(infoPath, `${JSON.stringify(buildInfo, null, 2)}\n`);
+
+	const sizeMb = (buildInfo.sizeBytes / (1024 * 1024)).toFixed(2);
 	console.log(`\nWrote ${output.total} hadiths to ${outPath} (${sizeMb} MB)`);
+	console.log(`Wrote build metadata to ${infoPath}`);
 	console.log(`Bangla text available for ${output.banglaAvailable} hadiths`);
 }
 

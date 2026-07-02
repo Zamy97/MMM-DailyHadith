@@ -46,6 +46,8 @@ Add to `~/MagicMirror/config/config.js`:
 
 Restart MagicMirror. No `npm install` required.
 
+**The hadith database (`data/hadiths.json`, ~7.6 MB) is pre-built and included in this repo.** Clone/pull is enough — do not run `npm run build:data` on the Pi.
+
 ## Configuration
 
 | Option | Description | Default |
@@ -125,13 +127,18 @@ Full Bangla text for Riyad/Bukhari/Muslim is not bundled yet (no open bulk datas
 
 At one hadith per day, that's **~15 years** before the cycle repeats.
 
-## Rebuilding the data file
+## Rebuilding the data file (maintainers only)
 
-To refresh or customize the bundled data:
+The built data lives in `data/hadiths.json` and is **saved in GitHub**. Mirror users only need `git pull`.
+
+To rebuild on your computer (or via GitHub Actions → **Build Hadith Data** → Run workflow):
 
 ```bash
-cd ~/MagicMirror/modules/MMM-DailyHadith
+cd MMM-DailyHadith
 npm run build:data
+git add data/hadiths.json data/build-info.json
+git commit -m "Rebuild hadith data"
+git push
 ```
 
 Edit `scripts/build-hadiths.js` to add or remove sources from [hadith-json](https://github.com/AhmedBaset/hadith-json).
