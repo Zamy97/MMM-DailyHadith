@@ -76,6 +76,14 @@ const PRESETS = {
 		label: "Full Hadith Library",
 		sources: [...DAILY_SOURCES, ...LIBRARY_EXTRA_SOURCES],
 		splitByBook: true
+	},
+	bangla: {
+		file: "data/bangla",
+		infoFile: "data/build-info-bangla.json",
+		label: "Bangla Hadith Collection",
+		sources: [...DAILY_SOURCES, ...LIBRARY_EXTRA_SOURCES].filter((source) => source.banglaEdition),
+		splitByBook: true,
+		banglaOnly: true
 	}
 };
 
@@ -117,6 +125,39 @@ function getChapterMap(chapters) {
 	return map;
 }
 
+/**
+ * Keep enough text to understand the teaching, but never cut mid-sentence.
+ * Ends on the last complete sentence that fits in maxLength.
+ */
+function truncateAtSentence(value, maxLength = 520) {
+	const cleaned = String(value || "")
+		.replace(/\s+/g, " ")
+		.trim();
+	if (!cleaned || cleaned.length <= maxLength) {
+		return cleaned;
+	}
+
+	const slice = cleaned.slice(0, maxLength);
+	const sentenceEnd = /[.!?।…](?=\s|$)/g;
+	let lastEnd = -1;
+	let match;
+	while ((match = sentenceEnd.exec(slice)) !== null) {
+		lastEnd = match.index;
+	}
+
+	// Prefer a complete sentence once we have enough context to make sense.
+	if (lastEnd >= 120) {
+		return slice.slice(0, lastEnd + 1).trim();
+	}
+
+	const lastSpace = slice.lastIndexOf(" ");
+	if (lastSpace > 80) {
+		return `${slice.slice(0, lastSpace).trim()}…`;
+	}
+
+	return `${slice.trim()}…`;
+}
+
 function buildSummary(narrator, text) {
 	if (!text) {
 		return "";
@@ -136,13 +177,12 @@ function buildSummary(narrator, text) {
 	for (const pattern of quotePatterns) {
 		const match = body.match(pattern);
 		if (match && match[1]) {
-			return trimSummary(match[1]);
+			return truncateAtSentence(match[1], 520);
 		}
 	}
 
 	const cleaned = body.replace(/\[.*?\]/g, "").trim();
-	const sentence = cleaned.split(/(?<=[.!?])\s+/)[0] || cleaned;
-	return trimSummary(sentence);
+	return truncateAtSentence(cleaned, 520);
 }
 
 function buildSummaryBn(textBn) {
@@ -152,19 +192,10 @@ function buildSummaryBn(textBn) {
 
 	const quoteMatch = textBn.match(/["“]([^"”]{20,})["”]/);
 	if (quoteMatch) {
-		return trimSummary(quoteMatch[1], 280);
+		return truncateAtSentence(quoteMatch[1], 520);
 	}
 
-	const sentence = textBn.split(/[।.!?]\s+/)[0] || textBn;
-	return trimSummary(sentence, 280);
-}
-
-function trimSummary(value, maxLength = 240) {
-	const cleaned = value.replace(/\s+/g, " ").trim();
-	if (cleaned.length <= maxLength) {
-		return cleaned;
-	}
-	return `${cleaned.slice(0, maxLength - 3)}...`;
+	return truncateAtSentence(textBn, 520);
 }
 
 async function loadBanglaEdition(editionName) {
@@ -241,7 +272,7 @@ function writeSplitLibrary(preset, collections, banglaAvailable) {
 
 	const index = {
 		builtAt: new Date().toISOString(),
-		preset: "library",
+		preset: preset.banglaOnly ? "bangla" : "library",
 		label: preset.label,
 		total: 0,
 		banglaAvailable: 0,
@@ -250,8 +281,15 @@ function writeSplitLibrary(preset, collections, banglaAvailable) {
 
 	let globalId = 1;
 
+	const filePrefix = preset.file.replace(/\\/g, "/");
+
 	for (const collection of collections) {
-		const bookHadiths = collection.hadiths.map((hadith) => ({
+		let bookHadiths = collection.hadiths;
+		if (preset.banglaOnly) {
+			bookHadiths = bookHadiths.filter((hadith) => hadith.textBn);
+		}
+
+		bookHadiths = bookHadiths.map((hadith) => ({
 			...hadith,
 			id: globalId++
 		}));
@@ -272,14 +310,14 @@ function writeSplitLibrary(preset, collections, banglaAvailable) {
 		index.banglaAvailable += bookOutput.banglaAvailable;
 		index.books.push({
 			name: collection.name,
-			file: `data/library/${filename}`,
+			file: `${filePrefix}/${filename}`,
 			count: bookHadiths.length,
 			banglaCount: bookOutput.banglaAvailable,
 			sizeBytes
 		});
 
 		const sizeMb = (sizeBytes / (1024 * 1024)).toFixed(2);
-		console.log(`  -> data/library/${filename} (${bookHadiths.length} hadiths, ${sizeMb} MB)`);
+		console.log(`  -> ${filePrefix}/${filename} (${bookHadiths.length} hadiths, ${sizeMb} MB)`);
 	}
 
 	const indexPath = path.join(libraryDir, "index.json");
@@ -289,7 +327,7 @@ function writeSplitLibrary(preset, collections, banglaAvailable) {
 	const infoPath = path.join(__dirname, "..", preset.infoFile);
 	const buildInfo = {
 		builtAt: index.builtAt,
-		preset: "library",
+		preset: preset.banglaOnly ? "bangla" : "library",
 		total: index.total,
 		banglaAvailable: index.banglaAvailable,
 		collections: index.books,
@@ -343,7 +381,15 @@ async function buildPreset(presetName) {
 		return writeSplitLibrary(preset, collections, banglaAvailable);
 	}
 
-	const allHadiths = collections.flatMap((collection) => collection.hadiths);
+	const allHadiths = collections
+		.flatMap((collection) => collection.hadiths)
+		.filter((hadith) => !preset.banglaOnly || hadith.textBn);
+
+	if (preset.banglaOnly) {
+		banglaAvailable = allHadiths.length;
+		console.log(`  = ${allHadiths.length} hadiths with Bangla text`);
+	}
+
 	const output = {
 		collection: preset.label,
 		preset: presetName,
@@ -368,6 +414,7 @@ async function main() {
 
 	if (mode === "all") {
 		await buildPreset("daily");
+		await buildPreset("bangla");
 		await buildPreset("library");
 		return;
 	}

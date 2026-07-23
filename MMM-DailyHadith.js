@@ -8,6 +8,10 @@ Module.register("MMM-DailyHadith", {
 		showBangla: true,
 		showReference: true,
 		showNarrator: true,
+		bilingual: false,
+		// Keep enough text to understand; never cut mid-sentence.
+		maxTextChars: 800,
+		maxSummaryChars: 520,
 		dataFile: "data/hadiths.json",
 		rotationMode: "daily",
 		updateInterval: 60 * 60 * 1000,
@@ -24,6 +28,62 @@ Module.register("MMM-DailyHadith", {
 			en: "translations/en.json",
 			bn: "translations/bn.json"
 		};
+	},
+
+	usesBangla() {
+		return this.config.language === "bn";
+	},
+
+	/**
+	 * Truncate for display at the last complete sentence within maxLength.
+	 * Avoids mid-sentence cutoffs that make the hadith hard to understand.
+	 */
+	truncateAtSentence(value, maxLength) {
+		const cleaned = String(value || "")
+			.replace(/\s+/g, " ")
+			.trim();
+		if (!cleaned || !maxLength || cleaned.length <= maxLength) {
+			return cleaned;
+		}
+
+		const slice = cleaned.slice(0, maxLength);
+		const sentenceEnd = /[.!?।…](?=\s|$)/g;
+		let lastEnd = -1;
+		let match;
+		while ((match = sentenceEnd.exec(slice)) !== null) {
+			lastEnd = match.index;
+		}
+
+		if (lastEnd >= 120) {
+			return slice.slice(0, lastEnd + 1).trim();
+		}
+
+		const lastSpace = slice.lastIndexOf(" ");
+		if (lastSpace > 80) {
+			return `${slice.slice(0, lastSpace).trim()}…`;
+		}
+
+		return `${slice.trim()}…`;
+	},
+
+	getDisplayText() {
+		let text = "";
+		if (this.usesBangla() && this.hadith.textBn) {
+			text = this.hadith.textBn;
+		} else {
+			text = this.hadith.text || "";
+		}
+		return this.truncateAtSentence(text, this.config.maxTextChars);
+	},
+
+	getDisplaySummary() {
+		let summary = "";
+		if (this.usesBangla() && this.hadith.summaryBn) {
+			summary = this.hadith.summaryBn;
+		} else {
+			summary = this.hadith.summary || "";
+		}
+		return this.truncateAtSentence(summary, this.config.maxSummaryChars);
 	},
 
 	requestHadith() {
@@ -78,9 +138,7 @@ Module.register("MMM-DailyHadith", {
 
 		if (this.config.showTopic) {
 			const topic =
-				this.config.language === "bn" && this.hadith.topicBn
-					? this.hadith.topicBn
-					: this.hadith.topic;
+				this.usesBangla() && this.hadith.topicBn ? this.hadith.topicBn : this.hadith.topic;
 			if (topic) {
 				this.appendBlock(
 					wrapper,
@@ -91,29 +149,49 @@ Module.register("MMM-DailyHadith", {
 		}
 
 		if (this.config.showArabic && this.hadith.arabic) {
-			this.appendBlock(wrapper, "hadith-arabic bright medium light", this.hadith.arabic);
+			this.appendBlock(
+				wrapper,
+				"hadith-arabic bright medium light",
+				this.truncateAtSentence(this.hadith.arabic, this.config.maxTextChars)
+			);
 		}
 
 		if (this.config.showTranslation) {
-			let html = "";
-			if (this.config.showNarrator && this.hadith.narrator) {
-				html += `<span class="hadith-narrator">${this.hadith.narrator}</span> `;
+			const displayText = this.getDisplayText();
+			if (displayText) {
+				const usingBangla = this.usesBangla() && this.hadith.textBn;
+				const translationClass = usingBangla
+					? "hadith-bangla bright small light"
+					: "hadith-translation bright small light";
+				let html = "";
+
+				if (this.config.showNarrator && this.hadith.narrator && !usingBangla) {
+					html += `<span class="hadith-narrator">${this.hadith.narrator}</span> `;
+				}
+
+				html += displayText;
+				this.appendBlock(wrapper, translationClass, html);
 			}
-			if (this.hadith.text) {
-				html += this.hadith.text;
-			}
-			this.appendBlock(wrapper, "hadith-translation bright small light", html);
 		}
 
-		if (this.config.showBangla && this.hadith.textBn) {
-			this.appendBlock(wrapper, "hadith-bangla bright small light", this.hadith.textBn);
+		if (this.config.bilingual && this.usesBangla() && this.hadith.textBn && this.hadith.text) {
+			this.appendBlock(
+				wrapper,
+				"hadith-translation dimmed xsmall light",
+				this.truncateAtSentence(this.hadith.text, this.config.maxTextChars)
+			);
+		}
+
+		if (!this.usesBangla() && this.config.showBangla && this.hadith.textBn) {
+			this.appendBlock(
+				wrapper,
+				"hadith-bangla bright small light",
+				this.truncateAtSentence(this.hadith.textBn, this.config.maxTextChars)
+			);
 		}
 
 		if (this.config.showSummary) {
-			const summary =
-				this.config.language === "bn" && this.hadith.summaryBn
-					? this.hadith.summaryBn
-					: this.hadith.summary;
+			const summary = this.getDisplaySummary();
 			if (summary) {
 				this.appendBlock(
 					wrapper,

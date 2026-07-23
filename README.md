@@ -63,6 +63,8 @@ A **full library** (~141 MB, 50,844 hadiths, 35k+ with Bangla) is also in `data/
 | `showNarrator` | Show narrator line before text | `true` |
 | `showReference` | Show hadith reference | `true` |
 | `language` | UI labels + prefer Bangla topic/summary: `en` or `bn` | `en` |
+| `maxTextChars` | Max chars for Arabic / translation / Bangla text; truncates at a **complete sentence** | `800` |
+| `maxSummaryChars` | Max chars for the teaching summary; truncates at a **complete sentence** | `520` |
 | `dataFile` | Path to JSON file (relative to module) | `data/hadiths.json` |
 | `rotationMode` | `"daily"` or `"random"` | `"daily"` |
 | `updateInterval` | How often to refresh (ms) | `3600000` (1 hour) |
@@ -106,15 +108,46 @@ The module picks hadith index = `dayOfYear % numberOfHadiths`. With 5,473 hadith
 
 | Field | Coverage |
 |-------|----------|
-| `summary` | All 5,473 hadiths (auto-extracted from English) |
+| `summary` | All 5,473 hadiths (auto-extracted from English, up to ~520 chars, ends on a complete sentence) |
 | `topic` | All hadiths (chapter name) |
 | `topicBn` | Riyad as-Salihin chapters (Bangla topic names) |
 | `textBn` | Nawawi 40 (42 hadiths) via [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api) |
 | `summaryBn` | Nawawi 40 (when Bangla text exists) |
 
-Set `language: "bn"` to use Bangla UI labels and prefer Bangla topic/summary when available.
+Long hadiths are trimmed for the mirror display using `maxTextChars` / `maxSummaryChars`, always at a sentence boundary so the teaching still makes sense. Raise those values (or set them to `0` / a very large number) if you want more text.
 
-Full Bangla text for Riyad/Bukhari/Muslim is not bundled yet (no open bulk dataset matched to this collection). You can add `textBn` to your own JSON entries.
+Set `language: "bn"` for Bangla UI labels. Hadith text uses Bangla when available (`textBn`), otherwise falls back to English automatically.
+
+```js
+{
+  module: "MMM-DailyHadith",
+  position: "bottom_bar",
+  config: {
+    language: "bn",
+    showTitle: true,
+    showTopic: true,
+    showSummary: true,
+    showArabic: true,
+    showTranslation: true,
+    showReference: true,
+    rotationMode: "daily"
+  }
+}
+```
+
+Optional — full Bangla collection (35k hadiths) if you have pulled `data/bangla/`:
+
+```js
+    dataFile: "data/bangla",
+```
+
+If `data/bangla` is missing or fails to load, the module falls back to `data/hadiths.json`.
+
+| `dataFile` | Bangla hadith text |
+|------------|-------------------|
+| `data/hadiths.json` | Only 42 (Nawawi) — most days show English |
+| `data/bangla` | **35,452** hadiths across 8 books — **use this for Bangla daily** |
+| `data/library/sahih-al-bukhari.json` | One book, 7,243 Bangla hadiths |
 
 ## Bundled collections (5,473 hadiths)
 
