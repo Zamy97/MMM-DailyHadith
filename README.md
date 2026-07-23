@@ -63,7 +63,7 @@ A **full library** (~141 MB, 50,844 hadiths, 35k+ with Bangla) is also in `data/
 | `showNarrator` | Show narrator line before text | `true` |
 | `showReference` | Show hadith reference | `true` |
 | `language` | UI labels + prefer Bangla topic/summary: `en` or `bn` | `en` |
-| `maxTextChars` | Max chars for Arabic / translation / Bangla text; truncates at a **complete sentence** | `800` |
+| `maxTextChars` | Max chars for Arabic / translation / Bangla text; `0` = full text. Non-zero truncates at a **complete sentence** | `0` |
 | `maxSummaryChars` | Max chars for the teaching summary; truncates at a **complete sentence** | `520` |
 | `dataFile` | Path to JSON file (relative to module) | `data/hadiths.json` |
 | `rotationMode` | `"daily"` or `"random"` | `"daily"` |

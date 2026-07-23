@@ -9,8 +9,8 @@ Module.register("MMM-DailyHadith", {
 		showReference: true,
 		showNarrator: true,
 		bilingual: false,
-		// Keep enough text to understand; never cut mid-sentence.
-		maxTextChars: 800,
+		// 0 = show full text. Set a number to truncate at a complete sentence.
+		maxTextChars: 0,
 		maxSummaryChars: 520,
 		dataFile: "data/hadiths.json",
 		rotationMode: "daily",
