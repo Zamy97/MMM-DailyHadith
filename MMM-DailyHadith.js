@@ -9,7 +9,7 @@ Module.register("MMM-DailyHadith", {
 		showReference: true,
 		showNarrator: true,
 		bilingual: false,
-		// 0 = show full text. Set a number to truncate at a complete sentence.
+		// The hadith translation is always shown in full. This only limits Arabic.
 		maxTextChars: 0,
 		maxSummaryChars: 520,
 		dataFile: "data/hadiths.json",
@@ -66,14 +66,44 @@ Module.register("MMM-DailyHadith", {
 		return `${slice.trim()}…`;
 	},
 
+	normalizeText(value) {
+		return String(value || "")
+			.replace(/\s+/g, " ")
+			.trim();
+	},
+
+	/**
+	 * Full hadith wording. Never shortened — the meaning depends on the whole text.
+	 */
 	getDisplayText() {
-		let text = "";
 		if (this.usesBangla() && this.hadith.textBn) {
-			text = this.hadith.textBn;
-		} else {
-			text = this.hadith.text || "";
+			return this.normalizeText(this.hadith.textBn);
 		}
-		return this.truncateAtSentence(text, this.config.maxTextChars);
+		return this.normalizeText(this.hadith.text || "");
+	},
+
+	appendHadithText(wrapper, className, text, narrator) {
+		const cleaned = this.normalizeText(text);
+		if (!cleaned) {
+			return;
+		}
+
+		const block = document.createElement("div");
+		block.className = className;
+
+		if (cleaned.length > 900) {
+			block.classList.add("hadith-long");
+		}
+
+		if (narrator) {
+			const narratorEl = document.createElement("span");
+			narratorEl.className = "hadith-narrator";
+			narratorEl.textContent = narrator;
+			block.appendChild(narratorEl);
+			block.appendChild(document.createTextNode(" "));
+		}
+		block.appendChild(document.createTextNode(cleaned));
+		wrapper.appendChild(block);
 	},
 
 	getDisplaySummary() {
@@ -157,37 +187,27 @@ Module.register("MMM-DailyHadith", {
 		}
 
 		if (this.config.showTranslation) {
-			const displayText = this.getDisplayText();
-			if (displayText) {
-				const usingBangla = this.usesBangla() && this.hadith.textBn;
-				const translationClass = usingBangla
-					? "hadith-bangla bright small light"
-					: "hadith-translation bright small light";
-				let html = "";
-
-				if (this.config.showNarrator && this.hadith.narrator && !usingBangla) {
-					html += `<span class="hadith-narrator">${this.hadith.narrator}</span> `;
-				}
-
-				html += displayText;
-				this.appendBlock(wrapper, translationClass, html);
-			}
+			const usingBangla = this.usesBangla() && this.hadith.textBn;
+			const translationClass = usingBangla
+				? "hadith-bangla bright small light"
+				: "hadith-translation bright small light";
+			const narrator =
+				this.config.showNarrator && this.hadith.narrator && !usingBangla
+					? this.hadith.narrator
+					: "";
+			this.appendHadithText(wrapper, translationClass, this.getDisplayText(), narrator);
 		}
 
 		if (this.config.bilingual && this.usesBangla() && this.hadith.textBn && this.hadith.text) {
-			this.appendBlock(
+			this.appendHadithText(
 				wrapper,
 				"hadith-translation dimmed xsmall light",
-				this.truncateAtSentence(this.hadith.text, this.config.maxTextChars)
+				this.hadith.text
 			);
 		}
 
 		if (!this.usesBangla() && this.config.showBangla && this.hadith.textBn) {
-			this.appendBlock(
-				wrapper,
-				"hadith-bangla bright small light",
-				this.truncateAtSentence(this.hadith.textBn, this.config.maxTextChars)
-			);
+			this.appendHadithText(wrapper, "hadith-bangla bright small light", this.hadith.textBn);
 		}
 
 		if (this.config.showSummary) {

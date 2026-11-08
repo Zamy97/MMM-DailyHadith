@@ -63,7 +63,7 @@ A **full library** (~141 MB, 50,844 hadiths, 35k+ with Bangla) is also in `data/
 | `showNarrator` | Show narrator line before text | `true` |
 | `showReference` | Show hadith reference | `true` |
 | `language` | UI labels + prefer Bangla topic/summary: `en` or `bn` | `en` |
-| `maxTextChars` | Max chars for Arabic / translation / Bangla text; `0` = full text. Non-zero truncates at a **complete sentence** | `0` |
+| `maxTextChars` | Max chars for Arabic only. English and Bangla translations are always shown in full | `0` |
 | `maxSummaryChars` | Max chars for the teaching summary; truncates at a **complete sentence** | `520` |
 | `dataFile` | Path to JSON file (relative to module) | `data/hadiths.json` |
 | `rotationMode` | `"daily"` or `"random"` | `"daily"` |
@@ -114,7 +114,7 @@ The module picks hadith index = `dayOfYear % numberOfHadiths`. With 5,473 hadith
 | `textBn` | Nawawi 40 (42 hadiths) via [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api) |
 | `summaryBn` | Nawawi 40 (when Bangla text exists) |
 
-Long hadiths are trimmed for the mirror display using `maxTextChars` / `maxSummaryChars`, always at a sentence boundary so the teaching still makes sense. Raise those values (or set them to `0` / a very large number) if you want more text.
+The English translation on the mirror is the full hadith text. It is not shortened. The optional teaching summary (`showSummary`) is a separate short extract and stays off unless you turn it on.
 
 Set `language: "bn"` for Bangla UI labels. Hadith text uses Bangla when available (`textBn`), otherwise falls back to English automatically.
 

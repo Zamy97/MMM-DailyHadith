@@ -20,6 +20,16 @@
 .MMM-DailyHadith .hadith-translation {
 	line-height: 1.5;
 	margin-bottom: 6px;
+	white-space: normal;
+	overflow: visible;
+	max-height: none;
+	text-overflow: clip;
+}
+
+.MMM-DailyHadith .hadith-translation.hadith-long,
+.MMM-DailyHadith .hadith-bangla.hadith-long {
+	font-size: 0.92rem;
+	line-height: 1.4;
 }
 
 .MMM-DailyHadith .hadith-bangla {
