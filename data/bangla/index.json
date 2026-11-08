@@ -1,5 +1,5 @@
 {
-  "builtAt": "2026-07-02T17:53:37.095Z",
+  "builtAt": "2026-11-08T19:32:28.685Z",
   "preset": "bangla",
   "label": "Bangla Hadith Collection",
   "total": 35452,
@@ -10,56 +10,56 @@
       "file": "data/bangla/nawawi-40.json",
       "count": 42,
       "banglaCount": 42,
-      "sizeBytes": 166996
+      "sizeBytes": 183257
     },
     {
       "name": "Sahih al-Bukhari",
       "file": "data/bangla/sahih-al-bukhari.json",
       "count": 7243,
       "banglaCount": 7243,
-      "sizeBytes": 29174188
+      "sizeBytes": 35245373
     },
     {
       "name": "Sahih Muslim",
       "file": "data/bangla/sahih-muslim.json",
       "count": 7265,
       "banglaCount": 7265,
-      "sizeBytes": 23642142
+      "sizeBytes": 29234460
     },
     {
       "name": "Sunan Abu Dawud",
       "file": "data/bangla/sunan-abu-dawud.json",
       "count": 5270,
       "banglaCount": 5270,
-      "sizeBytes": 18626662
+      "sizeBytes": 20285630
     },
     {
       "name": "Jami at-Tirmidhi",
       "file": "data/bangla/jami-at-tirmidhi.json",
       "count": 3891,
       "banglaCount": 3891,
-      "sizeBytes": 17852997
+      "sizeBytes": 19128739
     },
     {
       "name": "Sunan an-Nasa'i",
       "file": "data/bangla/sunan-an-nasa-i.json",
       "count": 5656,
       "banglaCount": 5656,
-      "sizeBytes": 16970852
+      "sizeBytes": 20052426
     },
     {
       "name": "Sunan Ibn Majah",
       "file": "data/bangla/sunan-ibn-majah.json",
       "count": 4336,
       "banglaCount": 4336,
-      "sizeBytes": 13386634
+      "sizeBytes": 14136322
     },
     {
       "name": "Muwatta Malik",
       "file": "data/bangla/muwatta-malik.json",
       "count": 1749,
       "banglaCount": 1749,
-      "sizeBytes": 6004657
+      "sizeBytes": 7566734
     }
   ]
 }
