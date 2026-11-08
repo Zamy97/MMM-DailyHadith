@@ -6,6 +6,7 @@
   "scripts": {
     "build:data": "node scripts/build-hadiths.js daily",
     "build:library": "node scripts/build-hadiths.js library",
+    "build:bangla": "node scripts/build-hadiths.js bangla",
     "build:all": "node scripts/build-hadiths.js all"
   },
   "keywords": [

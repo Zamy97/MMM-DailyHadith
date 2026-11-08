@@ -2,7 +2,7 @@
 
 A [MagicMirror²](https://github.com/MichMich/MagicMirror) module that shows a **daily hadith** from a **local JSON file** — no API, no internet needed after install.
 
-Similar layout to [MMM-RandomQuranAyah](https://github.com/slametps/MMM-RandomQuranAyah), but uses bundled hadith data and rotates one hadith per day.
+Pairs well with [MMM-QuranAyah](https://github.com/Zamy97/MMM-QuranAyah). Uses bundled hadith data and rotates one hadith per day.
 
 ## Features
 
@@ -199,7 +199,7 @@ You can add more collections by dropping JSON files into `data/`.
 
 ## Credits
 
-- Inspired by [MMM-RandomQuranAyah](https://github.com/slametps/MMM-RandomQuranAyah)
+- Related: [MMM-QuranAyah](https://github.com/Zamy97/MMM-QuranAyah)
 - Hadith text via [hadith-json](https://github.com/AhmedBaset/hadith-json)
 - Bangla text via [fawazahmed0/hadith-api](https://github.com/fawazahmed0/hadith-api)
 
